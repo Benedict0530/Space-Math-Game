@@ -130,15 +130,15 @@
             if (!isFullscreen()) {
               fullscreenCooldown = true;
               setTimeout(() => { fullscreenCooldown = false; }, 1000); // 1s cooldown
-              // Request fullscreen
+              let fullscreenPromise = null;
               if (elem.requestFullscreen) {
-                elem.requestFullscreen();
+                fullscreenPromise = elem.requestFullscreen();
               } else if (elem.mozRequestFullScreen) { /* Firefox */
-                elem.mozRequestFullScreen();
+                fullscreenPromise = elem.mozRequestFullScreen();
               } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-                elem.webkitRequestFullscreen();
+                fullscreenPromise = elem.webkitRequestFullscreen();
               } else if (elem.msRequestFullscreen) { /* IE/Edge */
-                elem.msRequestFullscreen();
+                fullscreenPromise = elem.msRequestFullscreen();
               }
               // Try to lock orientation to landscape (works only in fullscreen and on some browsers)
               if (screen.orientation && screen.orientation.lock) {
@@ -146,7 +146,17 @@
                   // Ignore errors silently
                 });
               }
-              unityInstance.SetFullscreen(1);
+              // Only call SetFullscreen(1) after fullscreen is granted
+              if (fullscreenPromise && typeof fullscreenPromise.then === 'function') {
+                fullscreenPromise.then(function() {
+                  unityInstance.SetFullscreen(1);
+                }).catch(function() {
+                  // Ignore errors
+                });
+              } else {
+                // Fallback for browsers that don't return a promise
+                setTimeout(function() { unityInstance.SetFullscreen(1); }, 100);
+              }
             }
           }
 
