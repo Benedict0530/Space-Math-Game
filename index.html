@@ -124,9 +124,19 @@
           }
 
           let fullscreenCooldown = false;
+          function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          }
+          function isSafari() {
+            return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+          }
           function requestFullscreen() {
             if (fullscreenCooldown) return;
-            var elem = document.documentElement;
+            if (isIOS()) {
+              unityShowBanner('Fullscreen is not supported on iOS Safari. For best experience, add to Home Screen.', 'warning');
+              return;
+            }
+            var elem = canvas;
             if (!isFullscreen()) {
               fullscreenCooldown = true;
               setTimeout(() => { fullscreenCooldown = false; }, 1000); // 1s cooldown
