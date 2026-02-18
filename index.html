@@ -133,7 +133,7 @@
           function requestFullscreen() {
             if (fullscreenCooldown) return;
             if (isIOS()) {
-              unityShowBanner('Fullscreen is not supported on iOS Safari. For best experience, add to Home Screen.', 'warning');
+              // On iOS Safari, just fill the viewport. No warning needed.
               return;
             }
             var elem = canvas;
