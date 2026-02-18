@@ -123,9 +123,13 @@
             return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
           }
 
+          let fullscreenCooldown = false;
           function requestFullscreen() {
+            if (fullscreenCooldown) return;
             var elem = document.documentElement;
             if (!isFullscreen()) {
+              fullscreenCooldown = true;
+              setTimeout(() => { fullscreenCooldown = false; }, 1000); // 1s cooldown
               // Request fullscreen
               if (elem.requestFullscreen) {
                 elem.requestFullscreen();
