@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
   <body>
+    <div id="landscape-overlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;align-items:center;justify-content:center;background:#231F20;color:white;font-size:2em;text-align:center;">
+      Please rotate your device to landscape mode to play the game.
+    </div>
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas" width=1080 height=720 tabindex="-1"></canvas>
       <div id="unity-loading-bar">
@@ -17,11 +20,6 @@
         </div>
       </div>
       <div id="unity-warning"> </div>
-      <div id="unity-footer">
-        <div id="unity-logo-title-footer"></div>
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">MathSpaceGame</div>
-      </div>
     </div>
     <script>
       var canvas = document.querySelector("#unity-canvas");
@@ -87,26 +85,28 @@
       // JS_FileSystem_Sync() behavior, but in future Unity version, this will be
       // expected to change.
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        // Mobile device style: fill the whole browser client area with the game canvas:
-
+      // Responsive: add viewport meta if not present
+      if (!document.querySelector('meta[name="viewport"]')) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
         document.getElementsByTagName('head')[0].appendChild(meta);
-        document.querySelector("#unity-container").className = "unity-mobile";
-        canvas.className = "unity-mobile";
-
-        // To lower canvas resolution on mobile devices to gain some
-        // performance, uncomment the following line:
-        // config.devicePixelRatio = 1;
-
-
-      } else {
-        // Desktop style: Render the game canvas in a window that can be maximized to fullscreen:
-        canvas.style.width = "1080px";
-        canvas.style.height = "720px";
       }
+
+      // Responsive resizing for all devices
+      function resizeUnityCanvas() {
+        var container = document.getElementById('unity-container');
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        container.style.width = w + 'px';
+        container.style.height = h + 'px';
+        canvas.width = w;
+        canvas.height = h;
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+      }
+      window.addEventListener('resize', resizeUnityCanvas);
+      resizeUnityCanvas();
 
       document.querySelector("#unity-loading-bar").style.display = "block";
 
@@ -117,14 +117,52 @@
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           document.querySelector("#unity-loading-bar").style.display = "none";
-          document.querySelector("#unity-fullscreen-button").onclick = () => {
-            unityInstance.SetFullscreen(1);
-          };
 
-          // Auto fullscreen on any click
-          document.body.addEventListener('click', function autoFullscreenHandler() {
-            unityInstance.SetFullscreen(1);
-          });
+          // Robust auto fullscreen on any click/touch (desktop & mobile)
+          function isFullscreen() {
+            return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+          }
+
+          function requestFullscreen() {
+            var elem = document.documentElement;
+            if (!isFullscreen()) {
+              // Request fullscreen
+              if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+              } else if (elem.mozRequestFullScreen) { /* Firefox */
+                elem.mozRequestFullScreen();
+              } else if (elem.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+                elem.webkitRequestFullscreen();
+              } else if (elem.msRequestFullscreen) { /* IE/Edge */
+                elem.msRequestFullscreen();
+              }
+              // Try to lock orientation to landscape (works only in fullscreen and on some browsers)
+              if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(function(e) {
+                  // Ignore errors silently
+                });
+              }
+              unityInstance.SetFullscreen(1);
+            }
+          }
+
+          // Listen for fullscreen change and update Unity fullscreen state
+          function onFullscreenChange() {
+            if (!isFullscreen()) {
+              // Exited fullscreen, update Unity
+              unityInstance.SetFullscreen(0);
+            } else {
+              // Entered fullscreen, update Unity
+              unityInstance.SetFullscreen(1);
+            }
+          }
+          document.addEventListener('fullscreenchange', onFullscreenChange);
+          document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+          document.addEventListener('mozfullscreenchange', onFullscreenChange);
+          document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+          document.body.addEventListener('click', requestFullscreen);
+          document.body.addEventListener('touchend', requestFullscreen);
 
         }).catch((message) => {
           alert(message);
