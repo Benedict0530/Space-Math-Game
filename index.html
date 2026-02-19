@@ -48,14 +48,13 @@
         warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
       }
 
-      // Unity build config
-        var buildUrl = "Build";
-        var loaderUrl = buildUrl + "/Downloads.loader.js";
-        var config = {
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/latest build.loader.js";
+      var config = {
         arguments: [],
-        dataUrl: buildUrl + "/Downloads.data.unityweb",
-        frameworkUrl: buildUrl + "/Downloads.framework.js.unityweb",
-        codeUrl: buildUrl + "/Downloads.wasm.unityweb",
+        dataUrl: buildUrl + "/latest build.data.unityweb",
+        frameworkUrl: buildUrl + "/latest build.framework.js.unityweb",
+        codeUrl: buildUrl + "/latest build.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "DefaultCompany",
         productName: "MathSpaceGame",
