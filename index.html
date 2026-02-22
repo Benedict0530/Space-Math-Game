@@ -109,19 +109,10 @@
               if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch(() => {});
               }
-              if (fullscreenPromise && typeof fullscreenPromise.then === 'function') {
-                fullscreenPromise.then(() => unityInstance.SetFullscreen(1)).catch(() => {});
-              } else {
-                setTimeout(() => unityInstance.SetFullscreen(1), 100);
-              }
+              // Do NOT call unityInstance.SetFullscreen(1); just use browser fullscreen
             }
           }
-          function onFullscreenChange() {
-            unityInstance.SetFullscreen(isFullscreen() ? 1 : 0);
-          }
-          ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt => {
-            document.addEventListener(evt, onFullscreenChange);
-          });
+          // No need to sync Unity's fullscreen state, just use browser fullscreen
           // Add fullscreen button to top right
           const fullscreenBtn = document.createElement('div');
           fullscreenBtn.id = 'unity-fullscreen-btn-custom';
