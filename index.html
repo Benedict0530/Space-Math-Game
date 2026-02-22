@@ -122,8 +122,29 @@
           ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt => {
             document.addEventListener(evt, onFullscreenChange);
           });
-          // document.body.addEventListener('click', requestFullscreen);
-          // document.body.addEventListener('touchend', requestFullscreen);
+          // Add fullscreen button to top right
+          const fullscreenBtn = document.createElement('div');
+          fullscreenBtn.id = 'unity-fullscreen-btn-custom';
+          fullscreenBtn.title = 'Go Fullscreen';
+          fullscreenBtn.style.position = 'fixed';
+          fullscreenBtn.style.top = '20px';
+          fullscreenBtn.style.right = '20px';
+          fullscreenBtn.style.width = '48px';
+          fullscreenBtn.style.height = '48px';
+          fullscreenBtn.style.background = "url('TemplateData/fullscreen-button.png') no-repeat center/contain, rgba(0,0,0,0.3)";
+          fullscreenBtn.style.zIndex = '10000';
+          fullscreenBtn.style.cursor = 'pointer';
+          fullscreenBtn.style.borderRadius = '8px';
+          fullscreenBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+          fullscreenBtn.style.display = 'flex';
+          fullscreenBtn.style.alignItems = 'center';
+          fullscreenBtn.style.justifyContent = 'center';
+          fullscreenBtn.style.transition = 'background 0.2s';
+          fullscreenBtn.addEventListener('mouseenter', () => fullscreenBtn.style.backgroundColor = 'rgba(0,0,0,0.5)');
+          fullscreenBtn.addEventListener('mouseleave', () => fullscreenBtn.style.backgroundColor = 'rgba(0,0,0,0.3)');
+          fullscreenBtn.addEventListener('click', requestFullscreen);
+          fullscreenBtn.addEventListener('touchend', requestFullscreen);
+          document.body.appendChild(fullscreenBtn);
         }).catch((message) => {
           alert(message);
         });
