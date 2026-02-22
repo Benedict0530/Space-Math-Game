@@ -122,8 +122,8 @@
           ['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(evt => {
             document.addEventListener(evt, onFullscreenChange);
           });
-          document.body.addEventListener('click', requestFullscreen);
-          document.body.addEventListener('touchend', requestFullscreen);
+          // document.body.addEventListener('click', requestFullscreen);
+          // document.body.addEventListener('touchend', requestFullscreen);
         }).catch((message) => {
           alert(message);
         });
